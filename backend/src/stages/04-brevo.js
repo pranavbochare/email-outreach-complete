@@ -17,10 +17,8 @@ export async function sendOutreach(contacts) {
   const results = { sent: [], failed: [] };
 
   for (const contact of contacts) {
-    console.log("Generating email for contact --------> :", contact);
-    const { subject, body } = await generateEmail(contact, "helping email");
-
-    console.log("Generated email subject from brevo --------> :", subject);
+    const subject = contact.subject;
+    const body = contact.body;
 
     log.info(`Sending to ${contact.name} <${contact.email.email}> @ ${contact.company}…`);
     log.dim(`  Subject: "${subject}"`);
@@ -42,7 +40,7 @@ export async function sendOutreach(contacts) {
             to: [{ email: contact.email.email, name: contact.name }],
             subject,
             textContent: body,
-            tags: ["vocallabs-outreach", contact.domain],
+            tags: ["email-outreach", contact.domain],
           }),
         3,
         `Brevo:${contact.email.email}`,

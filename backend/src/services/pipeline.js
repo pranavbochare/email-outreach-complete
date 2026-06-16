@@ -17,15 +17,18 @@ export async function generateCampaign(domain, description) {
     throw new Error("No decision makers found");
   }
 
-  const emailSubjectAndBody = await generateEmail(contacts[0], description);
+  // Generate personalized email for every contact
+  const emails = await Promise.all(
+    contacts.map(async (contact) => {
+      const emailSubjectAndBody = await generateEmail(contact, description);
 
-  const emails = contacts.map((contact) => ({
-    ...contact,
-
-    subject: emailSubjectAndBody.subject,
-
-    body: emailSubjectAndBody.body,
-  }));
+      return {
+        ...contact,
+        subject: emailSubjectAndBody.subject,
+        body: emailSubjectAndBody.body,
+      };
+    }),
+  );
 
   return emails;
 }

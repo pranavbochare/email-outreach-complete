@@ -25,7 +25,9 @@ function Dashboard() {
       });
     } catch (err) {
       console.error(err);
-      alert("Failed to generate campaign");
+      alert(
+        "Failed to generate outreach emails. Please check the company domain or try again later as the AI service may have reached its usage limit.",
+      );
     } finally {
       setLoading(false);
     }

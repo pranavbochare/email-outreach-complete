@@ -8,34 +8,45 @@ function ReviewEmails() {
 
   const emails = location.state?.emails || [];
 
+  const [editableEmails, setEditableEmails] = useState(emails);
+  const [loading, setLoading] = useState(false);
+
   const navigateBack = () => navigate("/");
 
-  const [subject, setSubject] = useState(emails[0]?.subject || "");
+  const updateSubject = (index, value) => {
+    const updated = [...editableEmails];
+    updated[index] = {
+      ...updated[index],
+      subject: value,
+    };
+    setEditableEmails(updated);
+  };
 
-  const [body, setBody] = useState(emails[0]?.body || "");
-
-  const [loading, setLoading] = useState(false);
+  const updateBody = (index, value) => {
+    const updated = [...editableEmails];
+    updated[index] = {
+      ...updated[index],
+      body: value,
+    };
+    setEditableEmails(updated);
+  };
 
   const sendEmails = async () => {
     try {
       setLoading(true);
 
-      const updatedEmails = emails.map((email) => ({
-        ...email,
-        subject,
-        body,
-      }));
-
       const response = await api.post("/send-campaign", {
-        emails: updatedEmails,
+        emails: editableEmails,
       });
 
       navigate("/success", {
         state: response.data,
       });
     } catch (err) {
-      console.error(err);
-      alert("Failed to send emails");
+      console.error("Failed to send emails:", err);
+      alert(
+        "Failed to generate outreach emails. Please check the company domain or try again later as the AI service may have reached its usage limit.",
+      );
     } finally {
       setLoading(false);
     }
@@ -45,45 +56,71 @@ function ReviewEmails() {
     <div style={styles.page}>
       <div style={styles.container}>
         <div style={styles.header}>
-          <h1 style={styles.title}>Review Outreach Email</h1>
+          <h1 style={styles.title}>Review Outreach Emails</h1>
 
-          <p style={styles.subtitle}>
-            Review and edit the email before sending it to all discovered contacts.
-          </p>
+          <p style={styles.subtitle}>Review and edit each email before sending.</p>
         </div>
 
         <div style={styles.statsContainer}>
           <div style={styles.statCard}>
-            <h2>{emails.length}</h2>
+            <h2>{editableEmails.length}</h2>
             <p>Recipients</p>
           </div>
 
           <div style={styles.statCard}>
-            <h2>{new Set(emails.map((email) => email.company)).size}</h2>
+            <h2>
+              {new Set(editableEmails.map((email) => email.company || "Unknown Company")).size}
+            </h2>
             <p>Companies</p>
           </div>
         </div>
 
-        <div style={styles.card}>
-          <label style={styles.label}>Subject</label>
+        {editableEmails.length === 0 ? (
+          <div style={styles.emptyCard}>
+            <h3>No Emails Found</h3>
+            <p>Please go back and generate emails first.</p>
+          </div>
+        ) : (
+          editableEmails.map((email, index) => (
+            <div key={index} style={styles.card}>
+              <div style={styles.emailHeader}>
+                <h3 style={styles.emailTitle}>{email.company || "Unknown Company"}</h3>
 
-          <input
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            style={styles.input}
-          />
+                <span style={styles.emailNumber}>Email #{index + 1}</span>
+              </div>
 
-          <label style={styles.label}>Email Body</label>
+              <label style={styles.label}>Recipient</label>
+              <input
+                type="text"
+                value={email.name || ""}
+                readOnly
+                style={{
+                  ...styles.input,
+                  backgroundColor: "#F9FAFB",
+                  cursor: "not-allowed",
+                }}
+              />
 
-          <textarea
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            style={styles.textarea}
-          />
-        </div>
+              <label style={styles.label}>Subject</label>
+              <input
+                type="text"
+                value={email.subject || ""}
+                onChange={(e) => updateSubject(index, e.target.value)}
+                style={styles.input}
+              />
+
+              <label style={styles.label}>Email Body</label>
+              <textarea
+                value={email.body || ""}
+                onChange={(e) => updateBody(index, e.target.value)}
+                style={styles.textarea}
+              />
+            </div>
+          ))
+        )}
 
         <div style={styles.buttonContainer}>
-          <button style={styles.secondaryButton} onClick={navigateBack}>
+          <button style={styles.secondaryButton} onClick={navigateBack} disabled={loading}>
             Back
           </button>
 
@@ -92,9 +129,9 @@ function ReviewEmails() {
               ...styles.primaryButton,
               opacity: loading ? 0.7 : 1,
             }}
-            disabled={loading}
+            disabled={loading || editableEmails.length === 0}
             onClick={sendEmails}>
-            {loading ? "Sending Emails..." : `Send To ${emails.length} Contacts`}
+            {loading ? "Sending Emails..." : `Send To ${editableEmails.length} Contacts`}
           </button>
         </div>
       </div>
@@ -138,7 +175,7 @@ const styles = {
 
   statCard: {
     flex: 1,
-    background: "#fff",
+    background: "#FFFFFF",
     borderRadius: "16px",
     padding: "24px",
     textAlign: "center",
@@ -146,15 +183,46 @@ const styles = {
   },
 
   card: {
-    background: "#fff",
+    background: "#FFFFFF",
     borderRadius: "16px",
-    padding: "30px",
+    padding: "24px",
+    marginBottom: "20px",
     boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+  },
+
+  emptyCard: {
+    background: "#FFFFFF",
+    borderRadius: "16px",
+    padding: "40px",
+    textAlign: "center",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+  },
+
+  emailHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "20px",
+  },
+
+  emailTitle: {
+    margin: 0,
+    color: "#111827",
+  },
+
+  emailNumber: {
+    background: "#DBEAFE",
+    color: "#1D4ED8",
+    padding: "6px 12px",
+    borderRadius: "999px",
+    fontSize: "13px",
+    fontWeight: "600",
   },
 
   label: {
     display: "block",
     marginBottom: "10px",
+    marginTop: "15px",
     fontWeight: "600",
     color: "#374151",
   },
@@ -164,14 +232,13 @@ const styles = {
     padding: "14px",
     border: "1px solid #D1D5DB",
     borderRadius: "12px",
-    marginBottom: "24px",
     fontSize: "15px",
     boxSizing: "border-box",
   },
 
   textarea: {
     width: "100%",
-    minHeight: "350px",
+    minHeight: "250px",
     padding: "16px",
     border: "1px solid #D1D5DB",
     borderRadius: "12px",
@@ -185,6 +252,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     marginTop: "30px",
+    marginBottom: "40px",
   },
 
   primaryButton: {
@@ -192,7 +260,7 @@ const styles = {
     border: "none",
     borderRadius: "12px",
     background: "#2563EB",
-    color: "#fff",
+    color: "#FFFFFF",
     fontWeight: "600",
     cursor: "pointer",
     fontSize: "15px",
@@ -202,7 +270,7 @@ const styles = {
     padding: "14px 28px",
     border: "1px solid #D1D5DB",
     borderRadius: "12px",
-    background: "#fff",
+    background: "#FFFFFF",
     cursor: "pointer",
     fontSize: "15px",
   },

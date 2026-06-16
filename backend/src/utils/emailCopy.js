@@ -27,15 +27,13 @@ async function subjects(company, industry, description) {
   const data = await response.json();
   const subject = data?.choices?.[0]?.message?.content?.trim();
 
-  console.log("Generated email subject:", subject);
-
   return subject;
 }
 
 async function buildBody(firstName, title, company, industry, description) {
   const { apiKey, model } = config.qwen;
 
-  const prompt = `build a email body for the following company: ${company} in ${industry} industry with the following description: ${description}. and also add ${firstName} (${title}) to the email.do not include this [your name] in the email body just give text. Please provide only the body content without any additional text.`;
+  const prompt = `build a email body for the following company: ${company} in ${industry} industry with the following description: ${description}. and also add ${firstName} (${title}) to the email.do not include this [your name] in the email body just give text and also do not add subject in this. Please provide only the body content without any additional text.`;
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -49,8 +47,6 @@ async function buildBody(firstName, title, company, industry, description) {
 
   const data = await response.json();
   const emailBody = data?.choices?.[0]?.message?.content?.trim();
-
-  console.log("Generated email body:", emailBody);
 
   return emailBody;
 }

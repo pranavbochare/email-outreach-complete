@@ -14,9 +14,6 @@ app.post("/generate-campaign", async (req, res) => {
   try {
     const { domain, description } = req.body;
 
-    console.log(`Generating campaign for domain: ${domain}`);
-    console.log(`Description: ${description}`);
-
     const emails = await generateCampaign(domain, description);
 
     res.json(emails);
