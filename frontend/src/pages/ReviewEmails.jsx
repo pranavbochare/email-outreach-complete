@@ -13,6 +13,8 @@ function ReviewEmails() {
 
   const navigateBack = () => navigate("/");
 
+  const API = import.meta.env.VITE_API_URL || "https://email-outreach-complete.vercel.app";
+
   const updateSubject = (index, value) => {
     const updated = [...editableEmails];
     updated[index] = {
@@ -35,7 +37,7 @@ function ReviewEmails() {
     try {
       setLoading(true);
 
-      const response = await api.post("/send-campaign", {
+      const response = await api.post(`${API}/send-campaign`, {
         emails: editableEmails,
       });
 

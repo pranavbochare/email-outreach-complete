@@ -9,11 +9,13 @@ function Dashboard() {
 
   const navigate = useNavigate();
 
+  const API = import.meta.env.VITE_API_URL || "https://email-outreach-complete.vercel.app";
+
   const generateCampaign = async () => {
     try {
       setLoading(true);
 
-      const response = await api.post("/generate-campaign", {
+      const response = await api.post(`${API}/generate-campaign`, {
         domain,
         description,
       });
