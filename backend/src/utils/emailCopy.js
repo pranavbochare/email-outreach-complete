@@ -68,66 +68,74 @@ async function buildBody(
   const prompt = `
 You are an expert B2B outreach copywriter.
 
-Your task is to write a highly personalized cold outreach email.
+Generate a complete, ready-to-send outreach email.
 
 INPUTS
 
-Company: ${company || "Unknown Company"}
-Industry: ${industry || "Unknown Industry"}
+Company:
+${company || "Unknown Company"}
 
-Recipient:
+Industry:
+${industry || "Unknown Industry"}
+
+Recipient Information:
 Name: ${firstName || ""}
 Title: ${title || ""}
 
-Sender:
+Sender Information:
 Name: ${senderName || ""}
 Email: ${senderEmail || ""}
 
-User's Offering / Goal:
+Outreach Objective:
 ${description || ""}
 
-EMAIL REQUIREMENTS
+INSTRUCTIONS
 
-1. Base the email primarily on the user's offering, goal, and value proposition.
-2. Personalize the opening using the recipient's name and role whenever available.
-3. Mention the company naturally if relevant, but do not invent facts about the company.
-4. Explain clearly why the sender is reaching out and how the recipient could benefit.
-5. Focus on business value and outcomes rather than product features.
-6. Use a professional, conversational, and human tone.
-7. Keep the email concise (120-200 words).
-8. Avoid buzzwords, hype, exaggerated claims, and generic sales language.
-9. Avoid phrases such as:
+* Write a personalized outreach email based primarily on the Outreach Objective.
+* The email should feel human, professional, and written specifically for the recipient.
+* Personalize the opening using the recipient's name and title when available.
+* Mention the company naturally when relevant.
+* Clearly explain why the sender is reaching out.
+* Focus on the value, opportunity, collaboration, proposal, internship request, partnership, product, or service described in the Outreach Objective.
+* Do NOT invent facts, achievements, metrics, or company information.
+* Do NOT use generic cold-email clichés such as:
 
-   * "I hope you're doing well"
-   * "I came across your profile"
-   * "Reaching out to see if"
-   * "Synergy"
-   * "Game-changing"
-   * "Revolutionary"
-10. End with a simple and natural call-to-action.
-11. Include a professional sign-off using the sender's name.
-12. Do not include the sender's email unless naturally needed in the signature.
-13. Do not generate a subject line.
-14. Do not use placeholders such as [Your Name], [Company Name], etc.
-15. If recipient information is unavailable, write a professional email without forcing personalization.
+  * "I hope you're doing well"
+  * "I came across your profile"
+  * "Just checking in"
+  * "Game-changing"
+  * "Revolutionary"
+  * "Synergy"
+* Keep the email concise, professional, and engaging.
+* Include a clear call-to-action near the end.
+* Write naturally as if the sender personally wrote the email.
+* Never use placeholders such as:
+  [Your Name]
+  [Company Name]
+  [Email]
+  [Phone]
+  [Recipient Name]
 
-OUTPUT FORMAT
+SIGNATURE REQUIREMENTS
 
-Return ONLY the email body text.
+* The email must be fully complete and ready to send.
+* End the email with exactly:
 
-Structure:
-Greeting
+Best regards,
+${senderName}
+${senderEmail}
 
-Opening personalized sentence
+* Never ask the user to replace or fill in any information.
+* Never generate placeholder signatures.
+* Always use the provided sender name and sender email in the closing.
 
-Value proposition / reason for reaching out
+OUTPUT REQUIREMENTS
 
-Brief explanation of potential benefit
-
-Call to action
-
-Closing with sender name and email.
-`;
+* Return ONLY the email body.
+* Do NOT generate a subject line.
+* Do NOT include explanations, notes, markdown, or code fences.
+* The output should be a complete email that can be sent immediately without any edits.
+  `;
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
