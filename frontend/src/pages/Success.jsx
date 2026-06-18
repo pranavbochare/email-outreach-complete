@@ -23,8 +23,8 @@ function Success() {
           </p>
 
           <ul style={styles.list}>
-            <li>Maximum 1 lookalike companies</li>
-            <li>Maximum 1 decision-makers per company</li>
+            <li>Maximum 2 lookalike companies</li>
+            <li>Maximum 2 decision-makers per company</li>
           </ul>
 
           <p style={styles.noteText}>We are going to increase these limits in the future.</p>

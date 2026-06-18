@@ -2,7 +2,7 @@ import { findLookalikes } from "../stages/01-ocean.js";
 import { findDecisionMakers } from "../stages/02-prospeo.js";
 import { generateEmail } from "../utils/emailCopy.js";
 
-export async function generateCampaign(domain, description) {
+export async function generateCampaign(senderName, senderEmail, domain, description) {
   // Stage 1
   const companies = await findLookalikes(domain);
 
@@ -20,7 +20,7 @@ export async function generateCampaign(domain, description) {
   // Generate personalized email for every contact
   const emails = await Promise.all(
     contacts.map(async (contact) => {
-      const emailSubjectAndBody = await generateEmail(contact, description);
+      const emailSubjectAndBody = await generateEmail(contact, senderName, senderEmail, description);
 
       return {
         ...contact,

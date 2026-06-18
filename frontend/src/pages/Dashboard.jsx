@@ -3,19 +3,63 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Dashboard() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [domain, setDomain] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const validateForm = () => {
+    if (!name.trim()) {
+      alert("Please enter your name");
+      return false;
+    }
+
+    if (!email.trim()) {
+      alert("Please enter your email");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address");
+      return false;
+    }
+
+    if (!domain.trim()) {
+      alert("Please enter a company domain");
+      return false;
+    }
+
+    const domainRegex = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+
+    if (!domainRegex.test(domain)) {
+      alert("Please enter a valid domain (e.g. stripe.com)");
+      return false;
+    }
+
+    if (!description.trim()) {
+      alert("Please enter an email description");
+      return false;
+    }
+
+    return true;
+  };
 
   const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_URL || "https://email-outreach-complete.vercel.app";
 
   const generateCampaign = async () => {
+    if (!validateForm()) return;
+
     try {
       setLoading(true);
 
       const response = await api.post(`${API}/generate-campaign`, {
+        name,
+        email,
         domain,
         description,
       });
@@ -28,7 +72,7 @@ function Dashboard() {
     } catch (err) {
       console.error(err);
       alert(
-        "Failed to generate outreach emails. Please check the company domain or try again later as the AI service may have reached its usage limit.",
+        "Failed to generate outreach emails. Please check the company domain or try again later.",
       );
     } finally {
       setLoading(false);
@@ -51,6 +95,29 @@ function Dashboard() {
             similar companies, identify decision makers, generate personalized outreach emails, and
             prepare them for review.
           </p>
+        </div>
+
+        <div>
+          <div style={styles.label}>Your Name</div>
+
+          <input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={styles.input}
+          />
+        </div>
+
+        <div>
+          <div style={styles.label}>Your Email</div>
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={styles.input}
+          />
         </div>
 
         <div>

@@ -1,10 +1,18 @@
 import { config } from "../../config/index.js";
 
-export async function generateEmail(contact, description) {
+export async function generateEmail(contact, senderName, senderEmail, description) {
   const { firstName, name, title, company, industry } = contact;
 
   const subject = await subjects(company, industry, description);
-  const body = await buildBody(firstName, title, company, industry, description);
+  const body = await buildBody(
+    firstName,
+    title,
+    company,
+    industry,
+    senderName,
+    senderEmail,
+    description,
+  );
 
   return { subject, body };
 }
@@ -46,32 +54,79 @@ Instructions:
   return subject;
 }
 
-async function buildBody(firstName, title, company, industry, description) {
+async function buildBody(
+  firstName,
+  title,
+  company,
+  industry,
+  senderName,
+  senderEmail,
+  description,
+) {
   const { apiKey, model } = config.qwen;
 
   const prompt = `
-Generate a professional and personalized outreach email body.
+You are an expert B2B outreach copywriter.
+
+Your task is to write a highly personalized cold outreach email.
+
+INPUTS
 
 Company: ${company || "Unknown Company"}
 Industry: ${industry || "Unknown Industry"}
-Recipient Name: ${firstName || ""}
-Recipient Title: ${title || ""}
-User's Outreach Purpose / Description:
+
+Recipient:
+Name: ${firstName || ""}
+Title: ${title || ""}
+
+Sender:
+Name: ${senderName || ""}
+Email: ${senderEmail || ""}
+
+User's Offering / Goal:
 ${description || ""}
 
-Instructions:
-- The email must be based primarily on the user's description and outreach objective.
-- Personalize the opening using the recipient's name and title when available.
-- Reference the company naturally where relevant.
-- Clearly communicate the value proposition, proposal, request, opportunity, or purpose described by the user.
-- Keep the tone professional, concise, and human.
-- Avoid generic sales language and unnecessary fluff.
-- Do not invent facts about the company.
-- If some information is missing, create the best possible email using the available details.
-- Include a natural greeting and closing.
-- Do NOT include placeholders such as [Your Name], [Company Name], or similar.
-- Do NOT generate an email subject.
-- Return ONLY the email body text with proper paragraph formatting.
+EMAIL REQUIREMENTS
+
+1. Base the email primarily on the user's offering, goal, and value proposition.
+2. Personalize the opening using the recipient's name and role whenever available.
+3. Mention the company naturally if relevant, but do not invent facts about the company.
+4. Explain clearly why the sender is reaching out and how the recipient could benefit.
+5. Focus on business value and outcomes rather than product features.
+6. Use a professional, conversational, and human tone.
+7. Keep the email concise (120-200 words).
+8. Avoid buzzwords, hype, exaggerated claims, and generic sales language.
+9. Avoid phrases such as:
+
+   * "I hope you're doing well"
+   * "I came across your profile"
+   * "Reaching out to see if"
+   * "Synergy"
+   * "Game-changing"
+   * "Revolutionary"
+10. End with a simple and natural call-to-action.
+11. Include a professional sign-off using the sender's name.
+12. Do not include the sender's email unless naturally needed in the signature.
+13. Do not generate a subject line.
+14. Do not use placeholders such as [Your Name], [Company Name], etc.
+15. If recipient information is unavailable, write a professional email without forcing personalization.
+
+OUTPUT FORMAT
+
+Return ONLY the email body text.
+
+Structure:
+Greeting
+
+Opening personalized sentence
+
+Value proposition / reason for reaching out
+
+Brief explanation of potential benefit
+
+Call to action
+
+Closing with sender name and email.
 `;
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
