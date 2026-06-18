@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 function Dashboard() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(localStorage.getItem("senderName") || "");
+  const [email, setEmail] = useState(localStorage.getItem("senderEmail") || "");
   const [domain, setDomain] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -56,6 +56,9 @@ function Dashboard() {
 
     try {
       setLoading(true);
+
+      localStorage.setItem("senderName", name);
+      localStorage.setItem("senderEmail", email);
 
       const response = await api.post(`${API}/generate-campaign`, {
         name,

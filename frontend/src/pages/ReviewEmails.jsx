@@ -40,6 +40,8 @@ function ReviewEmails() {
 
       const response = await api.post(`${API}/send-campaign`, {
         emails: editableEmails,
+        senderName: localStorage.getItem("senderName"),
+        senderEmail: localStorage.getItem("senderEmail"),
       });
 
       navigate("/success", {
@@ -61,6 +63,8 @@ function ReviewEmails() {
 
       await api.post(`${API}/send-campaign`, {
         emails: [email],
+        senderName: localStorage.getItem("senderName"),
+        senderEmail: localStorage.getItem("senderEmail"),
       });
 
       // Remove sent email from list

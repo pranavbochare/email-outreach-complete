@@ -28,9 +28,9 @@ app.post("/generate-campaign", async (req, res) => {
 
 app.post("/send-campaign", async (req, res) => {
   try {
-    const { emails } = req.body;
+    const { emails, senderName, senderEmail } = req.body;
 
-    const results = await sendCampaign(emails);
+    const results = await sendCampaign(emails, senderName, senderEmail);
 
     res.json({
       success: true,

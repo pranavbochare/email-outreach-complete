@@ -7,7 +7,7 @@ const client = buildClient(config.brevo.baseUrl, {
   "api-key": config.brevo.apiKey,
 });
 
-export async function sendOutreach(contacts) {
+export async function sendOutreach(contacts, senderName, senderEmail) {
   log.stage(4, "Brevo — Sending personalized outreach emails");
 
   if (config.pipeline.dryRun) {
@@ -36,6 +36,10 @@ export async function sendOutreach(contacts) {
             sender: {
               name: config.brevo.senderName,
               email: config.brevo.senderEmail,
+            },
+            replyTo: {
+              name: senderName,
+              email: senderEmail,
             },
             to: [{ email: contact.email.email, name: contact.name }],
             subject,
