@@ -90,6 +90,7 @@ INSTRUCTIONS
 
 * Write a personalized outreach email based primarily on the Outreach Objective.
 * The email should feel human, professional, and written specifically for the recipient.
+* Do NOT generate a subject line in the email body.
 * Personalize the opening using the recipient's name and title when available.
 * Clearly explain why the sender is reaching out.
 * Focus on the value, opportunity, collaboration, proposal, internship request, partnership, product, or service described in the Outreach Objective.
@@ -119,7 +120,6 @@ ${senderEmail}
 OUTPUT REQUIREMENTS
 
 * Return ONLY the email body.
-* Do NOT generate a subject line.
 * Do NOT include explanations, notes, markdown, or code fences.
 * The output should be a complete email that can be sent immediately without any edits.
   `;
