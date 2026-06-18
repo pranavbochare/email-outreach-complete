@@ -66,12 +66,9 @@ async function buildBody(
   const { apiKey, model } = config.qwen;
 
   const prompt = `
-You are an expert B2B outreach copywriter.
-
 Generate a complete, ready-to-send outreach email.
 
 INPUTS
-
 Company:
 ${company || "Unknown Company"}
 
@@ -94,18 +91,9 @@ INSTRUCTIONS
 * Write a personalized outreach email based primarily on the Outreach Objective.
 * The email should feel human, professional, and written specifically for the recipient.
 * Personalize the opening using the recipient's name and title when available.
-* Mention the company naturally when relevant.
 * Clearly explain why the sender is reaching out.
 * Focus on the value, opportunity, collaboration, proposal, internship request, partnership, product, or service described in the Outreach Objective.
 * Do NOT invent facts, achievements, metrics, or company information.
-* Do NOT use generic cold-email clichés such as:
-
-  * "I hope you're doing well"
-  * "I came across your profile"
-  * "Just checking in"
-  * "Game-changing"
-  * "Revolutionary"
-  * "Synergy"
 * Keep the email concise, professional, and engaging.
 * Include a clear call-to-action near the end.
 * Write naturally as if the sender personally wrote the email.
@@ -125,9 +113,8 @@ Best regards,
 ${senderName}
 ${senderEmail}
 
-* Never ask the user to replace or fill in any information.
+* Never ask the user to replace or fill in any information in [].
 * Never generate placeholder signatures.
-* Always use the provided sender name and sender email in the closing.
 
 OUTPUT REQUIREMENTS
 

@@ -12,9 +12,9 @@ app.use(express.json());
 
 app.post("/generate-campaign", async (req, res) => {
   try {
-    const { senderName, senderEmail, domain, description } = req.body;
+    const { name, email, domain, description } = req.body;
 
-    const emails = await generateCampaign(senderName, senderEmail, domain, description);
+    const emails = await generateCampaign(name, email, domain, description);
 
     res.json(emails);
   } catch (error) {
