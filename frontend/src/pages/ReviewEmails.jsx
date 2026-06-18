@@ -10,6 +10,7 @@ function ReviewEmails() {
 
   const [editableEmails, setEditableEmails] = useState(emails);
   const [loading, setLoading] = useState(false);
+  const [sendingIndex, setSendingIndex] = useState(null);
 
   const navigateBack = () => navigate("/");
 
@@ -54,6 +55,27 @@ function ReviewEmails() {
     }
   };
 
+  const sendSingleEmail = async (email, index) => {
+    try {
+      setSendingIndex(index);
+
+      await api.post(`${API}/send-campaign`, {
+        emails: [email],
+      });
+
+      // Remove sent email from list
+      setEditableEmails((prev) => prev.filter((_, i) => i !== index));
+
+      alert("Email sent successfully");
+    } catch (err) {
+      console.error("Failed to send email:", err);
+
+      alert("Failed to send email. Please check the company domain or try again later.");
+    } finally {
+      setSendingIndex(null);
+    }
+  };
+
   return (
     <div style={styles.page}>
       <div style={styles.container}>
@@ -88,7 +110,19 @@ function ReviewEmails() {
               <div style={styles.emailHeader}>
                 <h3 style={styles.emailTitle}>{email.company || "Unknown Company"}</h3>
 
-                <span style={styles.emailNumber}>Email #{index + 1}</span>
+                <div style={styles.headerActions}>
+                  <span style={styles.emailNumber}>Email #{index + 1}</span>
+
+                  <button
+                    style={{
+                      ...styles.sendSingleButton,
+                      opacity: sendingIndex === index ? 0.7 : 1,
+                    }}
+                    disabled={sendingIndex === index}
+                    onClick={() => sendSingleEmail(email, index)}>
+                    {sendingIndex === index ? "Sending..." : "Send"}
+                  </button>
+                </div>
               </div>
 
               <label style={styles.label}>Recipient</label>
@@ -146,6 +180,23 @@ const styles = {
     minHeight: "100vh",
     background: "#F3F4F6",
     padding: "40px",
+  },
+
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  },
+
+  sendSingleButton: {
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "8px",
+    background: "#10B981",
+    color: "#FFFFFF",
+    fontWeight: "600",
+    cursor: "pointer",
+    fontSize: "13px",
   },
 
   container: {
