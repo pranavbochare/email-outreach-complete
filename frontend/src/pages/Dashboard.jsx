@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 function Dashboard() {
   const [name, setName] = useState(localStorage.getItem("senderName") || "");
@@ -11,36 +12,36 @@ function Dashboard() {
 
   const validateForm = () => {
     if (!name.trim()) {
-      alert("Please enter your name");
+      toast.error("Please enter your name");
       return false;
     }
 
     if (!email.trim()) {
-      alert("Please enter your email");
+      toast.error("Please enter your email");
       return false;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address");
+      toast.error("Please enter a valid email address");
       return false;
     }
 
     if (!domain.trim()) {
-      alert("Please enter a company domain");
+      toast.error("Please enter a company domain");
       return false;
     }
 
     const domainRegex = /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 
     if (!domainRegex.test(domain)) {
-      alert("Please enter a valid domain (e.g. stripe.com)");
+      toast.error("Please enter a valid domain (e.g. stripe.com)");
       return false;
     }
 
     if (!description.trim()) {
-      alert("Please enter an email description");
+      toast.error("Please enter an email description");
       return false;
     }
 
@@ -60,12 +61,20 @@ function Dashboard() {
       localStorage.setItem("senderName", name);
       localStorage.setItem("senderEmail", email);
 
-      const response = await api.post(`${API}/generate-campaign`, {
-        name,
-        email,
-        domain,
-        description,
-      });
+      const response = await toast.promise(
+        api.post(`${API}/generate-campaign`, {
+          name,
+          email,
+          domain,
+          description,
+        }),
+        {
+          loading: "Generating campaign...",
+          success: "Campaign generated successfully!",
+          error:
+            "Failed to generate outreach emails. Please check the company domain or try again later.",
+        },
+      );
 
       navigate("/review", {
         state: {
@@ -74,9 +83,6 @@ function Dashboard() {
       });
     } catch (err) {
       console.error(err);
-      alert(
-        "Failed to generate outreach emails. Please check the company domain or try again later.",
-      );
     } finally {
       setLoading(false);
     }

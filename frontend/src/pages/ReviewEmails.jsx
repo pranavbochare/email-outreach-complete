@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 function ReviewEmails() {
   const location = useLocation();
@@ -38,20 +39,28 @@ function ReviewEmails() {
     try {
       setLoading(true);
 
-      const response = await api.post(`${API}/send-campaign`, {
-        emails: editableEmails,
-        senderName: localStorage.getItem("senderName"),
-        senderEmail: localStorage.getItem("senderEmail"),
-      });
+      const response = await toast.promise(
+        api.post(`${API}/send-campaign`, {
+          emails: editableEmails,
+          senderName: localStorage.getItem("senderName"),
+          senderEmail: localStorage.getItem("senderEmail"),
+        }),
+        {
+          loading: `Sending ${editableEmails.length} emails...`,
+          success: (response) => {
+            const sentCount = response.data?.sent?.length ?? editableEmails.length;
+            return `${sentCount} emails sent successfully`;
+          },
+          error: (err) =>
+            err.response?.data?.message || "Failed to send emails. Please try again later.",
+        },
+      );
 
       navigate("/success", {
         state: response.data,
       });
     } catch (err) {
       console.error("Failed to send emails:", err);
-      alert(
-        "Failed to generate outreach emails. Please check the company domain or try again later as the AI service may have reached its usage limit.",
-      );
     } finally {
       setLoading(false);
     }
@@ -61,20 +70,24 @@ function ReviewEmails() {
     try {
       setSendingIndex(index);
 
-      await api.post(`${API}/send-campaign`, {
-        emails: [email],
-        senderName: localStorage.getItem("senderName"),
-        senderEmail: localStorage.getItem("senderEmail"),
-      });
+      await toast.promise(
+        api.post(`${API}/send-campaign`, {
+          emails: [email],
+          senderName: localStorage.getItem("senderName"),
+          senderEmail: localStorage.getItem("senderEmail"),
+        }),
+        {
+          loading: `Sending email to ${email.name || "recipient"}...`,
+          success: "Email sent successfully",
+          error: (err) =>
+            err.response?.data?.message || "Failed to send email. Please try again later.",
+        },
+      );
 
       // Remove sent email from list
       setEditableEmails((prev) => prev.filter((_, i) => i !== index));
-
-      alert("Email sent successfully");
     } catch (err) {
       console.error("Failed to send email:", err);
-
-      alert("Failed to send email. Please check the company domain or try again later.");
     } finally {
       setSendingIndex(null);
     }
